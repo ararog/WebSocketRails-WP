@@ -1,7 +1,16 @@
-WebSocketRails-WP
-=================
+# WebSocketsRails client port for iOS
 
-A Windows Phone client of WebSocket-Rails
+Port of JavaScript client provided by https://github.com/websocket-rails/websocket-rails
+
+Built on top of WebSocket4Net
+
+## Misc
+
+Refer to https://github.com/websocket-rails/websocket-rails to learn more about WebSocketRails
+
+Refer to https://websocket4net.codeplex.com to learn more about WebSocket4Net
+
+## Example
 
 Since data exchange is JSON based, it's strongly recommended to use JSON.NET
 API to deserialize data.
