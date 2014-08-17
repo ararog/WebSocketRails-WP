@@ -7,9 +7,9 @@ using System.Resources;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("WebSocketRails")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A Windows Phone client of WebSocket-Rails")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("BMobile")]
 [assembly: AssemblyProduct("WebSocketRails")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
