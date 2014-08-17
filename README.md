@@ -1,4 +1,4 @@
-# WebSocketsRails client port for iOS
+# WebSocketsRails client port for Windows Phone
 
 Port of JavaScript client provided by https://github.com/websocket-rails/websocket-rails
 
