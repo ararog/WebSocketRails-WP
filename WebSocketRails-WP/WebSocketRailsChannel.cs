@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,7 +35,8 @@ namespace WebSocketRails
             info["channel"] = channelName;
         
             data["data"] = info;
-        
+
+            frame.Add(data);
             frame.Add(dispatcher.ConnectionId);
         
             WebSocketRailsEvent _event = new WebSocketRailsEvent(frame, null, null);
@@ -47,7 +49,7 @@ namespace WebSocketRails
         public void Bind(String eventName, EventHandler<WebSocketRailsDataEventArgs> callback)
         {
 		
-	        if (callbacks[eventName] == null)
+	        if (! callbacks.ContainsKey(eventName))
                 callbacks[eventName] = new List<EventHandler<WebSocketRailsDataEventArgs>>();
 	    
 	        callbacks[eventName].Add(callback);
@@ -64,7 +66,8 @@ namespace WebSocketRails
             info["channel"] = channelName;
             info["data"] = message;
             info["token"] = token;
-        
+
+            frame.Add(info);
             frame.Add(dispatcher.ConnectionId);
         
             WebSocketRailsEvent _event = new WebSocketRailsEvent(frame, null, null);
@@ -76,11 +79,13 @@ namespace WebSocketRails
         {
 	        if(eventName == "websocket_rails.channel_token") {
 	        
-	            Dictionary<String, Object> info = (Dictionary<String, Object>) message;
-	            this.token = (String) info["token"];
+	            Dictionary<String, Object> info = (message as JObject)
+                    .ToObject<Dictionary<String, Object>>();
+	            
+                this.token = (String) info["token"];
 	        }
 	        else {
-	            if (callbacks[eventName] == null)
+	            if (! callbacks.ContainsKey(eventName))
 	                return;
 
                 foreach (EventHandler<WebSocketRailsDataEventArgs> callback in callbacks[eventName])
@@ -103,7 +108,8 @@ namespace WebSocketRails
             info["channel"] = channelName;
                 
             data["data"] = info;
-        
+
+            frame.Add(data);
             frame.Add(dispatcher.ConnectionId);
         
             WebSocketRailsEvent _event = new WebSocketRailsEvent(frame, null, null);

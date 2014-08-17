@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ namespace WebSocketRails
 	    private Uri url;
 	    private Dictionary<String, WebSocketRailsChannel> channels;
 	    private String connectionId;
-	    private Dictionary<int, WebSocketRailsEvent> queue;
+        private Dictionary<long, WebSocketRailsEvent> queue;
         private Dictionary<String, List<EventHandler<WebSocketRailsDataEventArgs>>> callbacks;
 	    private WebSocketRailsConnection connection;
 	
@@ -21,7 +22,7 @@ namespace WebSocketRails
             this.url = url;
             state = "connecting";
             channels = new Dictionary<String, WebSocketRailsChannel>();
-            queue = new Dictionary<int, WebSocketRailsEvent>();
+            queue = new Dictionary<long, WebSocketRailsEvent>();
             callbacks = new Dictionary<String, List<EventHandler<WebSocketRailsDataEventArgs>>>();
         
             connection = new WebSocketRailsConnection(url, this);
@@ -30,13 +31,13 @@ namespace WebSocketRails
 
 	    public void NewMessage(List<Object> data)
         {
-	        foreach (Object socket_message in data)
+	        foreach (JArray socket_message in data)
 	        {
-	            WebSocketRailsEvent _event = new WebSocketRailsEvent(socket_message);
+	            WebSocketRailsEvent _event = new WebSocketRailsEvent(socket_message.ToObject<List<Object>>());
 	        
 	            if (_event.IsResult)
 	            {
-	                if (queue[_event.Id] != null)
+	                if (queue.ContainsKey(_event.Id))
 	                {
 	                    queue[_event.Id].RunCallbacks(_event.IsSuccess, _event.Data);
 	                    queue.Remove(_event.Id);
@@ -57,18 +58,19 @@ namespace WebSocketRails
 	    public void ConnectionEstablished(Object data) 
         {
 	        state = "connected";
-	        if(data.GetType() == typeof(Dictionary<String, Object>)) {
+	        if(data.GetType() == typeof(JObject)) {
 
-                Dictionary<String, Object> infoDictionary = (Dictionary<String, Object>) data;
-	    	
-		        connectionId = (String) infoDictionary["connection_id"];
-		        connection.FlushQueue(connectionId);
+                Dictionary<String, Object> infoDictionary = ((JObject)data)
+                    .ToObject<Dictionary<String, Object>>();
+
+                ConnectionId = (String)infoDictionary["connection_id"];
+                connection.FlushQueue(ConnectionId);
 	        }
 	    }
 
         public void Bind(String eventName, EventHandler<WebSocketRailsDataEventArgs> callback)
         {
-	        if (callbacks[eventName] == null)
+	        if (! callbacks.ContainsKey(eventName))
                 callbacks[eventName] = new List<EventHandler<WebSocketRailsDataEventArgs>>();
 	    
 	        callbacks[eventName].Add(callback);		
@@ -88,7 +90,7 @@ namespace WebSocketRails
 	
 	    public void TriggerEvent(WebSocketRailsEvent _event) 
         {
-	         if (queue[_event.Id] != null && queue[_event.Id] == _event)
+	         if (queue.ContainsKey(_event.Id) && queue[_event.Id] == _event)
 	             return;
 	     
 	         queue[_event.Id] = _event;
@@ -97,7 +99,7 @@ namespace WebSocketRails
 	
 	    public void Dispatch(WebSocketRailsEvent _event) 
         {
-	        if (callbacks[_event.Name] == null)
+	        if (! callbacks.ContainsKey(_event.Name))
 	            return;
 
             foreach (EventHandler<WebSocketRailsDataEventArgs> callback in callbacks[_event.Name])
@@ -108,7 +110,7 @@ namespace WebSocketRails
 	
 	    public WebSocketRailsChannel Subscribe(String channelName) 
         {
-	        if (channels[channelName] == null)
+	        if (channels.ContainsKey(channelName))
 	            return channels[channelName];
 	    
 	        WebSocketRailsChannel channel = new WebSocketRailsChannel(channelName, this, false);
@@ -120,7 +122,7 @@ namespace WebSocketRails
 	
 	    public void Unsubscribe(String channelName) 
         {
-	        if (channels[channelName] == null)
+            if (! channels.ContainsKey(channelName))
 	            return;
 	    
 	        channels[channelName].Destroy();
@@ -129,7 +131,7 @@ namespace WebSocketRails
 
 	    private void DispatchChannel(WebSocketRailsEvent _event)
 	    {
-	        if (channels[_event.Channel] == null)
+	        if (! channels.ContainsKey(_event.Channel))
 	            return;
 	    
 	        channels[_event.Channel].Dispatch(_event.Name, _event.Data);
@@ -140,7 +142,7 @@ namespace WebSocketRails
 		    List<Object> frame = new List<Object>();
 		    frame.Add("websocket_rails.pong");
 		    frame.Add(new Dictionary<String, Object>());
-		    frame.Add(connectionId);
+		    frame.Add(ConnectionId);
 		
 	        WebSocketRailsEvent pong = new WebSocketRailsEvent(frame);
 	        connection.Trigger(pong);

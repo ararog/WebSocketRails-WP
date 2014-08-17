@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,25 +19,29 @@ namespace WebSocketRails
 	    {
 		    if(data is List<Object>) 
             {
-			    List<Object> listOfData = (List<Object>) data;
+                List<Object> listOfData = (List<Object>)data;
 			
 			    Name = (String) listOfData[0];
-	            Attr = (Dictionary<String, Object>) listOfData[1];
-	        
+
+                if (! (listOfData[1] is JObject))
+                    Attr = (Dictionary<string, object>) listOfData[1];
+	            else
+                    Attr = (listOfData[1] as JObject).ToObject<Dictionary<string, object>>();
+
 	            if (Attr != null)
 	            {
-	                if (Attr["id"] != null)
-	                    Id = (int) Attr["id"];
+	                if (Attr.ContainsKey("id"))
+	                    Id = (long) (Attr["id"] == null ? 0L : Attr["id"]);
 	                else
-	                    Id = (int) new Random().Next();
+                        Id = (long)new Random().Next();
 	            
-	                if (Attr["channel"] != null)
+	                if (Attr.ContainsKey("channel"))
 	                    Channel = (String) Attr["channel"];
 	            
-	                if (Attr["data"] != null)
+	                if (Attr.ContainsKey("data"))
 	                    Data = Attr["data"];
 	            
-	                if (Attr["token"] != null)
+	                if (Attr.ContainsKey("token"))
 	                    Token = (String) Attr["token"];	            
 	            
 	                if (listOfData.Count > 2 && listOfData[2] != null)
@@ -44,7 +49,7 @@ namespace WebSocketRails
 	                else
 	                    ConnectionId = "";
 	            
-	                if (Attr["success"] != null)
+	                if (Attr.ContainsKey("success") && Attr["success"] != null)
 	                {
 	                    result = true;
 	                    IsSuccess = (Boolean) Attr["success"];
@@ -103,7 +108,7 @@ namespace WebSocketRails
 
         public Dictionary<String, Object> Attr { get; set; }
 
-        public int Id{ get; set;}
+        public long Id { get; set; }
 
         public String Channel{ get; set;}
 
@@ -119,7 +124,7 @@ namespace WebSocketRails
         {
             get
             {
-                return Channel != null;
+                return ! String.IsNullOrEmpty(Channel);
             }
         }
 
