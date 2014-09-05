@@ -65,6 +65,13 @@ namespace WebSocketRails
 
                 ConnectionId = (String)infoDictionary["connection_id"];
                 connection.FlushQueue(ConnectionId);
+
+                List<Object> frame = new List<Object>();
+                frame.Add("connection_opened");
+                frame.Add(new Dictionary<String, Object>());
+
+                WebSocketRailsEvent openedEvent = new WebSocketRailsEvent(frame);
+                Dispatch(openedEvent);   
 	        }
 	    }
 
