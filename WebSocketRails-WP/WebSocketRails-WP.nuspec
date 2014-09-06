@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>WebSocketRails</id>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
     <title>WebSocketRails</title>
     <authors>Rogério Pereira Araújo</authors>
     <owners>Rogério Pereira Araújo</owners>
     <projectUrl>https://github.com/ararog/WebSocketRails-WP</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A Windows Phone client of WebSocket-Rails</description>
-    <releaseNotes>Build fixes.</releaseNotes>
+    <releaseNotes>API improvements.</releaseNotes>
     <copyright>Copyright 2014</copyright>
     <tags>WebSocket-Rails Windows Phone WebSocket</tags>
   </metadata>

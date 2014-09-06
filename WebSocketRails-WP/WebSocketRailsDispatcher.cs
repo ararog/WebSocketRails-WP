@@ -155,6 +155,11 @@ namespace WebSocketRails
 	        connection.Trigger(pong);
 	    }
 
+        public void Connect()
+        {
+            connection.Connect();
+        }
+
 	    public void Disconnect()
 	    {
 	        connection.Disconnect();

@@ -30,7 +30,6 @@ namespace WebSocketRails
             webSocket = new WebSocket(uri.ToString(), "", "");
             webSocket.Closed += webSocket_Closed;
             webSocket.MessageReceived += webSocket_MessageReceived;
-            webSocket.Open();
 	    }
 
         void webSocket_MessageReceived(object sender, MessageReceivedEventArgs e)
@@ -67,6 +66,11 @@ namespace WebSocketRails
 	            webSocket.Send(serializedEvent);
 	        }		
 	    }
+
+        public void Connect()
+        {
+            webSocket.Open();
+        }
 
 	    public void Disconnect() 
         {
