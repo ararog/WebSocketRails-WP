@@ -87,13 +87,29 @@ namespace WebSocketRails
         {
 		    List<Object> frame = new List<Object>();
 		    frame.Add(eventName);
-		    frame.Add(data);
+
+            if (data is Dictionary<string, object>)
+            {
+                frame.Add(data);
+            }
+            else
+            {
+                Dictionary<string, object> payload = new Dictionary<string, object>();
+                payload.Add("data", data);
+                frame.Add(payload);
+            }
+
 		    frame.Add(connectionId);
 		
 	        WebSocketRailsEvent _event = new WebSocketRailsEvent(frame, success, failure);
 	        queue[_event.Id] = _event;
 	        connection.Trigger(_event);
 	    }
+
+        public void Trigger(String eventName, Object data)
+        {
+            Trigger(eventName, data, null, null);
+        }
 	
 	    public void TriggerEvent(WebSocketRailsEvent _event) 
         {
@@ -114,7 +130,12 @@ namespace WebSocketRails
 	            callback(this, new WebSocketRailsDataEventArgs(_event.Data));
 	        }		
 	    }
-	
+
+        public bool IsSubscribed(String channelName)
+        {
+            return channels.ContainsKey(channelName);
+        }
+
 	    public WebSocketRailsChannel Subscribe(String channelName) 
         {
 	        if (channels.ContainsKey(channelName))
@@ -168,10 +189,8 @@ namespace WebSocketRails
 	    public String State { get; set; }
 		    
 	    public Uri Uri { get; set; }
-	
-	    public Dictionary<String, WebSocketRailsChannel> Channels { get; set; }
-	
-	    public String ConnectionId { get; set; }
+
+        public String ConnectionId { get; set; }
 
     }
 }
