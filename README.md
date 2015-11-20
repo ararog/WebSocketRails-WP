@@ -53,3 +53,7 @@ private void messageReceived(object sender, WebSocketRailsDataEventArgs e)
 }
 
 ```
+
+## Projects using WebSocketRails-WP
+
+(Ow for Windows Phone)[https://github.com/ararog/Ow-WP]
